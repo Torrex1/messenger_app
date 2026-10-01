@@ -14,7 +14,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     const existingUser = await db.user.findUnique({ where: {email} });
     if (existingUser) {
-      res.status(400).json({ message: "This email is already registred" });
+      res.status(409).json({ message: "This email is already registered" });
       return;
     }
 

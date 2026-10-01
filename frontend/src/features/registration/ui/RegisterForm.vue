@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import axios from 'axios'
+
 import { BaseInput } from '../../../shared/ui/input';
 import { BaseButton } from '../../../shared/ui/button';
 import { register } from '../api/register';
@@ -40,11 +42,26 @@ async function handleSubmit() {
     return; 
   }
 
-  await register({
-    name: name.value,
-    email: email.value,
-    password: password.value,
-  })
+  try {
+    await register({
+      name: name.value,
+      email: email.value,
+      password: password.value,
+    })
+    
+    name.value = "";
+    email.value = "";
+    password.value = "";
+    confirmPassword.value = "";
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message = error.response?.data.message;
+
+      if (error.response?.status === 409 && message) {
+        errors.value.email = message;
+      }
+    }
+  }
 }
 </script>
 
