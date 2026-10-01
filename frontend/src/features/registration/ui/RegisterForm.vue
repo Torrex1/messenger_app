@@ -11,6 +11,7 @@ const name = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
+const isLoading = ref(false);
 
 const errors = ref<{
   name?: string,
@@ -43,6 +44,8 @@ async function handleSubmit() {
   }
 
   try {
+    isLoading.value = true;
+
     await register({
       name: name.value,
       email: email.value,
@@ -61,6 +64,8 @@ async function handleSubmit() {
         errors.value.email = message;
       }
     }
+  } finally {
+      isLoading.value = false;
   }
 }
 </script>
@@ -82,7 +87,7 @@ async function handleSubmit() {
       <BaseInput label-text="Email" required label-type="email" v-model="email" :error="errors.email" />
       <BaseInput label-text="Password" required label-type="password" v-model="password" :error="errors.password" />
       <BaseInput label-text="Confirm password" required label-type="password" v-model="confirmPassword" :error="errors.confirmPassword" />
-      <BaseButton button-text="Register" />
+      <BaseButton :disabled="isLoading" button-text="Register" />
     </form>
   </div>
 </template>
