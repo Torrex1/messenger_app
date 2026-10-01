@@ -1,6 +1,51 @@
-<script setup>
-import { BaseInput } from '../../../shared/input';
-import { BaseButton } from '../../../shared/button';
+<script setup lang="ts">
+import { ref } from 'vue'
+import { BaseInput } from '../../../shared/ui/input';
+import { BaseButton } from '../../../shared/ui/button';
+import { register } from '../api/register';
+import { registerSchema } from '../model/validation';
+
+const name = ref('');
+const email = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+
+const errors = ref<{
+  name?: string,
+  email?: string,
+  password?: string,
+  confirmPassword?: string
+}>({})
+
+async function handleSubmit() {
+  errors.value = {};
+
+  const result = registerSchema.safeParse({
+    name: name.value,
+    email: email.value,
+    password: password.value,
+    confirmPassword: confirmPassword.value,
+  })
+
+  if (!result.success) {
+    const fieldErrors = result.error.flatten().fieldErrors;
+
+    errors.value = {
+      name: fieldErrors.name?.[0],
+      email: fieldErrors.email?.[0],
+      password: fieldErrors.password?.[0],
+      confirmPassword: fieldErrors.confirmPassword?.[0],
+    }
+
+    return; 
+  }
+
+  await register({
+    name: name.value,
+    email: email.value,
+    password: password.value,
+  })
+}
 </script>
 
 <template>
@@ -15,11 +60,12 @@ import { BaseButton } from '../../../shared/button';
       </p>
     </div>
 
-    <div class="flex flex-col gap-2 p-4">
-      <BaseInput label-text="Name" />
-      <BaseInput label-text="Email" label-type="email" />
-      <BaseInput label-text="Password" label-type="password" />
+    <form novalidate @submit.prevent="handleSubmit" class="flex flex-col gap-2 p-4">
+      <BaseInput label-text="Name" required v-model="name" :error="errors.name" />
+      <BaseInput label-text="Email" required label-type="email" v-model="email" :error="errors.email" />
+      <BaseInput label-text="Password" required label-type="password" v-model="password" :error="errors.password" />
+      <BaseInput label-text="Confirm password" required label-type="password" v-model="confirmPassword" :error="errors.confirmPassword" />
       <BaseButton button-text="Register" />
-    </div>
+    </form>
   </div>
 </template>
