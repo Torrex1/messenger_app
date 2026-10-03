@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { RegistrationCard } from "../../pages/auth-registration";
+import { RegistrationCard, LoginCard } from "../../pages/auth-registration";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -9,6 +9,11 @@ const router = createRouter({
       name: "register",
       component: RegistrationCard
     },
+    {
+      path: "/login",
+      name: "login",
+      component: LoginCard
+    }
   ]
 })
 

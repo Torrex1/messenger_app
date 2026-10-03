@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import axios from 'axios'
+import { isAxiosError } from 'axios'
 
 import { BaseInput } from '../../../shared/ui/input';
 import { BaseButton } from '../../../shared/ui/button';
@@ -57,7 +57,7 @@ async function handleSubmit() {
     password.value = "";
     confirmPassword.value = "";
   } catch (error) {
-    if (axios.isAxiosError(error)) {
+    if (isAxiosError(error)) {
       const message = error.response?.data.message;
 
       if (error.response?.status === 409 && message) {
@@ -89,5 +89,12 @@ async function handleSubmit() {
       <BaseInput label-text="Confirm password" required label-type="password" v-model="confirmPassword" :error="errors.confirmPassword" />
       <BaseButton :disabled="isLoading" button-text="Register" />
     </form>
+    
+    <div>
+      <span>
+        Already have an account?
+        <RouterLink to="/login" class="text-green-500 font-bold">Sign in</RouterLink>
+      </span>
+    </div>
   </div>
 </template>
