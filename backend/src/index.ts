@@ -1,10 +1,10 @@
 import "dotenv/config"
+import { createServer } from "http"
 
 import express from "express"
-import authRouter from "./routes/auth.routes.js"
 import cors from 'cors';
 
-import { createServer } from "http"
+import authRouter from "./routes/auth.routes.js"
 
 const app = express();
 const server = createServer(app);

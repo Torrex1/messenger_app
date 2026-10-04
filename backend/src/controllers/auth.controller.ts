@@ -29,9 +29,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       }
     });
 
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error("jwt secret key is not defined");
+    }
+
     const token = jwt.sign(
       { userId: newUser.id },
-      process.env.JWT_SECRET || "jsonwebtokenSecretKey",
+      secret,
       { expiresIn: "30d" }
     );
 
@@ -71,9 +76,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error("jwt secret key is not defined");
+    }
+
     const token = jwt.sign(
       { userId: user.id },
-      process.env.JWT_SECRET || "jsonwebtokenSecretKey",
+      secret,
       { expiresIn: "30d" }
     );
 
@@ -89,5 +99,35 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     console.log("Authorization error:", error);
     res.status(500).json({ message: "Internal server error during authorization" });
+  }
+}
+
+export const getMe = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const user = await db.user.findUnique({
+      where: {
+        id: req.userId
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+    })
+
+    if (!user) {
+      res.status(401).json({ message: "User not found" });
+      return;
+    }
+
+    res.status(200).json(user);
+  } catch(error) {
+    console.log("Get current user error:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 }
