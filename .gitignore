@@ -35,5 +35,3 @@ dist-ssr
 .cursor
 .devine
 backend/src/generated/
-
-*.sql
