@@ -7,6 +7,8 @@ import { BaseButton } from '../../../shared/ui/button';
 import { register } from '../api/register';
 import { registerSchema } from '../model/validation';
 
+import { useAuthStore } from '../../../entities/user/model/authStore';
+
 const name = ref('');
 const email = ref('');
 const password = ref('');
@@ -19,6 +21,8 @@ const errors = ref<{
   password?: string,
   confirmPassword?: string
 }>({})
+
+const authStore = useAuthStore();
 
 async function handleSubmit() {
   errors.value = {};
@@ -46,11 +50,13 @@ async function handleSubmit() {
   try {
     isLoading.value = true;
 
-    await register({
+    const response = await register({
       name: name.value,
       email: email.value,
       password: password.value,
     })
+
+    authStore.setAuth(response.data.token, response.data.user);
     
     name.value = "";
     email.value = "";

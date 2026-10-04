@@ -8,6 +8,8 @@ import { BaseButton } from '../../../shared/ui/button';
 import { loginSchema } from '../model/validation';
 import { login } from '../api/login';
 
+import { useAuthStore } from '../../../entities/user/model/authStore';
+
 const email = ref('');
 const password = ref('');
 const isLoading = ref(false);
@@ -17,6 +19,8 @@ const errors = ref<{
   password?: string,
   errorText?: string;
 }>({})
+
+const authStore = useAuthStore();
 
 async function handleSubmit() {
   errors.value = {};
@@ -39,11 +43,13 @@ async function handleSubmit() {
   try {
     isLoading.value = true;
 
-    await login({
+    const response = await login({
       email: email.value,
       password: password.value,
     })
 
+    authStore.setAuth(response.data.token, response.data.user);
+    
     email.value = "";
     password.value = "";
   } catch(error) {
